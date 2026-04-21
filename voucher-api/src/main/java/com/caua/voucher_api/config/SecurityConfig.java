@@ -1,5 +1,4 @@
 package com.caua.voucher_api.config;
-
 import com.caua.voucher_api.filter.JwtFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,16 +15,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @Configuration
 public class SecurityConfig {
-
     private final JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users/**", "/auth/**").permitAll()
-                        .anyRequest().authenticated()).sessionManagement(session -> session.sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
+                        .requestMatchers(
+                                "/users/**",
+                                "/auth/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs"
+                        ).permitAll()
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(
+                        org.springframework.security.config.http.SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
